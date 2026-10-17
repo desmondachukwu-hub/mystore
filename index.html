@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Everyday Goods</title>
+<style>
+:root{--bg:#f6f7f4;--surface:#fff;--ink:#1d2421;--muted:#5d6762;--line:#dfe3dd;--accent:#1f5f4a;--accent-ink:#fff;--sale:#b3412e;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121715;--surface:#1b221f;--ink:#eef1ee;--muted:#9aa5a0;--line:#2c3631;--accent:#5bbf9a;--accent-ink:#0c1512;--sale:#e5826f}}
+:root[data-theme="dark"]{--bg:#121715;--surface:#1b221f;--ink:#eef1ee;--muted:#9aa5a0;--line:#2c3631;--accent:#5bbf9a;--accent-ink:#0c1512;--sale:#e5826f}
+*{box-sizing:border-box}html{scroll-padding-top:70px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Trebuchet MS",Verdana,sans-serif;line-height:1.5}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:12px 18px}
+.logo{font-family:Georgia,serif;font-size:1.4rem;font-weight:700}
+button{font:inherit;cursor:pointer}
+.cartbtn{background:var(--accent);color:var(--accent-ink);border:0;border-radius:8px;padding:8px 14px;font-weight:700}
+.hero{padding:44px 18px 28px;max-width:900px;margin:auto}
+.hero h1{font-family:Georgia,serif;font-size:clamp(2rem,7vw,3.4rem);line-height:1.1;margin:0 0 12px;max-width:14ch}
+.hero p{color:var(--muted);max-width:46ch;margin:0}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding:16px 18px;max-width:900px;margin:auto}
+.tab{white-space:nowrap;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:7px 16px}
+.tab[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;padding:6px 18px 40px;max-width:900px;margin:auto}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
+.thumb{aspect-ratio:1;display:grid;place-items:center;font-size:3.2rem}
+.info{padding:10px 12px 12px;display:flex;flex-direction:column;gap:4px;flex:1}
+.name{font-weight:700;font-size:.95rem}.cat{color:var(--muted);font-size:.8rem}
+.price{margin-top:auto;padding-top:6px;font-weight:700}.price s{color:var(--muted);font-weight:400;margin-left:6px}.price .sale{color:var(--sale)}
+.add{margin-top:8px;border:1px solid var(--accent);background:transparent;color:var(--accent);border-radius:8px;padding:7px;font-weight:700}
+.add:hover{background:var(--accent);color:var(--accent-ink)}
+.add:focus-visible,.tab:focus-visible,.cartbtn:focus-visible,.qty button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+#panel{position:fixed;inset:0 0 0 auto;width:min(380px,100%);background:var(--surface);border-left:1px solid var(--line);transform:translateX(100%);transition:transform .25s;z-index:10;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+#panel.open{transform:none}
+#scrim{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:9;display:none}#scrim.open{display:block}
+.ph{display:flex;justify-content:space-between;align-items:center;padding:16px 18px;border-bottom:1px solid var(--line)}.ph h2{margin:0;font-size:1.1rem}
+.close{background:none;border:0;color:var(--ink);font-size:1.4rem}
+#items{flex:1;overflow-y:auto;padding:8px 18px}
+.row{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+.row .e{font-size:1.8rem}.row .t{flex:1;font-size:.9rem}
+.qty{display:flex;align-items:center;gap:8px}.qty button{width:28px;height:28px;border-radius:6px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.pf{padding:16px 18px;border-top:1px solid var(--line)}
+.tot{display:flex;justify-content:space-between;font-weight:700;margin-bottom:12px}
+.checkout{width:100%;background:var(--accent);color:var(--accent-ink);border:0;border-radius:8px;padding:12px;font-weight:700}
+.empty{color:var(--muted);padding:30px 0;text-align:center}
+.done{padding:30px 18px;text-align:center}
+footer{border-top:1px solid var(--line);padding:24px 18px;color:var(--muted);text-align:center;font-size:.85rem}
+</style>
+</head>
+<body>
+<header><span class="logo">Everyday Goods</span><button class="cartbtn" id="open" aria-label="Open cart">Cart (<span id="count">0</span>)</button></header>
+<section class="hero"><h1>Clothing, tech and home, in one shop.</h1><p>Pick what you need, add it to your cart, and check out in a few taps.</p></section>
+<div style="padding:0 18px;max-width:900px;margin:auto"><input id="search" type="search" placeholder="Search 100 products" aria-label="Search products" style="width:100%;padding:11px 14px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font:inherit"></div>
+<nav class="tabs" id="tabs" aria-label="Categories"></nav>
+<main class="grid" id="grid"></main>
+<footer>© 2026 Everyday Goods. Free shipping on orders over $75.</footer>
+<div id="scrim"></div>
+<aside id="panel" aria-label="Shopping cart"><div class="ph"><h2>Your cart</h2><button class="close" id="close" aria-label="Close cart">×</button></div><div id="items"></div><div class="pf" id="pf"></div></aside>
+<script>
+var P=[
+{id:1,n:"Cotton crew tee",c:"Clothing",p:24,e:"👕",bg:"#dfe9e2"},
+{id:2,n:"Denim jacket",c:"Clothing",p:78,o:98,e:"🧥",bg:"#dde5ee"},
+{id:3,n:"Canvas sneakers",c:"Clothing",p:55,e:"👟",bg:"#efe6da"},
+{id:4,n:"Wool beanie",c:"Clothing",p:19,e:"🧢",bg:"#ece3e6"},
+{id:5,n:"Wireless earbuds",c:"Electronics",p:59,o:79,e:"🎧",bg:"#e0e4ec"},
+{id:6,n:"20,000 mAh power bank",c:"Electronics",p:35,e:"🔋",bg:"#e4ecdf"},
+{id:7,n:"Smart LED bulb (2 pack)",c:"Electronics",p:22,e:"💡",bg:"#f1ecd6"},
+{id:8,n:"Phone stand",c:"Electronics",p:14,e:"📱",bg:"#e3e3ea"},
+{id:9,n:"Ceramic mug set",c:"Home",p:32,e:"☕",bg:"#efe3d9"},
+{id:10,n:"Linen throw blanket",c:"Home",p:48,e:"🛋️",bg:"#e6e9dc"},
+{id:11,n:"Soy candle",c:"Home",p:18,e:"🕯️",bg:"#f0e4dc"},
+{id:12,n:"Storage baskets (3)",c:"Home",p:29,o:39,e:"🧺",bg:"#ebe5d6"}];
+var G={Clothing:"Cotton crew tee,24,👕;Slim jeans,49,👖;Summer dress,45,👗;Denim jacket,78,🧥;Canvas sneakers,55,👟;Wool beanie,19,🧢;Knit scarf,22,🧣;Winter gloves,18,🧤;Crew socks (6 pack),16,🧦;Oxford shirt,42,👔;Silk blouse,52,👚;Swimsuit,34,👙;Chino shorts,29,🩳;Sun hat,21,👒;Day backpack,44,🎒;Tote bag,26,👜;Leather boots,89,🥾;Dress shoes,85,👞;Heeled sandals,48,👠;Sunglasses,28,🕶️;Leather wallet,31,👛;Hoodie,46,🧥;Joggers,38,👖;Polo shirt,33,👕;Puffer vest,64,🦺;Rain jacket,72,🧥;Pajama set,36,👚;Leather belt,20,👔;Baseball cap,17,🧢;Flip flops,15,🩴;Running shoes,68,👟;Cardigan,54,🧶;Leggings,27,👖;Silk tie,19,👔",Electronics:"Wireless earbuds,59,🎧;Over-ear headphones,99,🎧;Power bank,35,🔋;Smart LED bulbs (2),22,💡;Phone stand,14,📱;Phone case,15,📱;USB-C cable,12,🔌;Fast charger,25,🔌;Bluetooth speaker,45,🔊;Smartwatch,89,⌚;Fitness tracker,49,⌚;HD webcam,39,📷;Keyboard,54,⌨️;Wireless mouse,24,🖱️;Laptop stand,32,💻;27-inch monitor,179,🖥️;Tablet,199,📱;Action camera,119,📹;Ring light,29,💡;USB microphone,62,🎙️;Smart plug,13,🔌;Security camera,42,📷;Wi-Fi router,69,📡;Portable SSD,79,💾;Flash drive,11,💾;Memory card,17,💾;E-reader,109,📖;Game controller,49,🎮;Camera drone,149,🚁;Mini projector,129,📽️;Desk fan,26,🌀;Electric toothbrush,39,🪥;Hair dryer,35,💨;Car phone mount,16,🚗",Home:"Ceramic mug set,32,☕;Linen throw blanket,48,🛋️;Soy candle,18,🕯️;Storage baskets (3),29,🧺;Cookware set,119,🍳;Chef knife,45,🔪;Cutting board,24,🪵;Dinner plates (4),38,🍽️;Wine glasses (4),28,🍷;Water bottle,22,🧴;Coffee maker,79,☕;Electric kettle,36,🫖;Blender,59,🥤;Toaster,41,🍞;Air fryer,89,🍟;Bath towels (4),40,🛁;Bed sheet set,65,🛏️;Pillow,25,🛌;Duvet,80,🛏️;Wall clock,27,🕰️;Picture frames (3),21,🖼️;Table lamp,34,🪔;Area rug,95,🧶;Plant pot,17,🪴;Succulent set,20,🌵;Wall mirror,47,🪞;Shower curtain,19,🚿;Laundry hamper,31,🧺;Vacuum cleaner,139,🧹;Broom set,23,🧹;Trash can,26,🗑️;Door mat,18,🚪"},cc=["#dfe9e2","#dde5ee","#efe6da","#ece3e6","#e4ecdf","#f1ecd6"],k=0,q="";
+P=[];Object.keys(G).forEach(function(c){G[c].split(";").forEach(function(s){var r=s.split(",");k++;P.push({id:k,n:r[0],c:c,p:+r[1],o:k%7==0?Math.round(r[1]*1.25):0,e:r[2],bg:cc[k%6]})})});
+var cats=["All","Clothing","Electronics","Home"],cur="All",cart={};
+var $=function(i){return document.getElementById(i)};
+function money(n){return "$"+n.toFixed(2)}
+function tabs(){$("tabs").innerHTML=cats.map(function(c){return '<button class="tab" aria-pressed="'+(c===cur)+'" data-c="'+c+'">'+c+'</button>'}).join("")}
+function grid(){$("grid").innerHTML=P.filter(function(x){return (cur==="All"||x.c===cur)&&x.n.toLowerCase().indexOf(q)>-1}).map(function(x){
+return '<article class="card"><div class="thumb" style="background:'+x.bg+'" aria-hidden="true">'+x.e+'</div><div class="info"><span class="name">'+x.n+'</span><span class="cat">'+x.c+'</span><span class="price"><span class="'+(x.o?"sale":"")+'">'+money(x.p)+'</span>'+(x.o?'<s>'+money(x.o)+'</s>':'')+'</span><button class="add" data-id="'+x.id+'">Add to cart</button></div></article>'}).join("")}
+function find(id){return P.filter(function(x){return x.id==id})[0]}
+function render(){
+var ids=Object.keys(cart),n=0,t=0;
+ids.forEach(function(i){n+=cart[i];t+=cart[i]*find(i).p});
+$("count").textContent=n;
+if(!ids.length){$("items").innerHTML='<div class="empty">Your cart is empty. Add a product to get started.</div>';$("pf").innerHTML="";return}
+$("items").innerHTML=ids.map(function(i){var x=find(i);return '<div class="row"><span class="e">'+x.e+'</span><span class="t">'+x.n+'<br>'+money(x.p)+'</span><span class="qty"><button data-m="'+i+'" aria-label="Remove one">−</button>'+cart[i]+'<button data-a="'+i+'" aria-label="Add one">+</button></span></div>'}).join("");
+var ship=t>=75?0:6.99;
+$("pf").innerHTML='<div class="tot"><span>Subtotal</span><span>'+money(t)+'</span></div><div class="tot" style="font-weight:400;color:var(--muted)"><span>Shipping</span><span>'+(ship?money(ship):"Free")+'</span></div><div class="tot"><span>Total</span><span>'+money(t+ship)+'</span></div><button class="checkout" id="co">Place order</button>'}
+function panel(o){$("panel").classList.toggle("open",o);$("scrim").classList.toggle("open",o)}
+document.addEventListener("click",function(e){
+var t=e.target;
+if(t.dataset.c){cur=t.dataset.c;tabs();grid()}
+else if(t.classList.contains("add")){cart[t.dataset.id]=(cart[t.dataset.id]||0)+1;render();t.textContent="Added";setTimeout(function(){t.textContent="Add to cart"},900)}
+else if(t.dataset.a){cart[t.dataset.a]++;render()}
+else if(t.dataset.m){if(--cart[t.dataset.m]<=0)delete cart[t.dataset.m];render()}
+else if(t.id==="open")panel(true);
+else if(t.id==="close"||t.id==="scrim")panel(false);
+else if(t.id==="co"){cart={};render();$("items").innerHTML='<div class="done"><h2>Order placed</h2><p>This is a demo store, so no payment was taken. Connect a payment provider to go live.</p></div>'}
+});
+$("search").addEventListener("input",function(e){q=e.target.value.toLowerCase().trim();grid()});
+tabs();grid();render();
+</script>
+</body>
+</html>
